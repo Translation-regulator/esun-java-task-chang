@@ -17,7 +17,7 @@ public class LikeService {
 
     @Transactional
     public void addLike(LikeRequest req) {
-        likeRepository.insertLike(req.getUserId(), req.getProductId(), req.getOrderQuantity());
+        likeRepository.insertLike(req);
     }
 
     public List<LikeResponse> getLikes() {
@@ -28,7 +28,8 @@ public class LikeService {
         likeRepository.deleteLike(sn);
     }
 
-    public void updateLike(int sn, int quantity) {
-        likeRepository.updateLike(sn, quantity);
+    @Transactional
+    public void updateLike(int sn, int orderQuantity) {
+        likeRepository.updateLike(sn, orderQuantity);
     }
 }
