@@ -16,8 +16,8 @@
     <h3 style="margin-top: 2rem;">新增金融商品</h3>
     <form @submit.prevent="addProduct">
       <input v-model="productForm.productName" placeholder="商品名稱" required />
-      <input v-model.number="productForm.price" type="number" placeholder="價格" required />
-      <input v-model.number="productForm.feeRate" type="number" placeholder="手續費率" required />
+      <input v-model.number="productForm.price" type="number"  step="any" placeholder="價格" required />
+      <input v-model.number="productForm.feeRate" type="number"  step="any" placeholder="手續費率" required />
       <button type="submit">新增商品</button>
     </form>
 
