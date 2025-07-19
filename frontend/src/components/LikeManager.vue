@@ -25,23 +25,44 @@
     <table>
       <thead>
         <tr>
-          <th>商品名稱</th><th>價格</th><th>手續費率</th><th>帳號</th><th>Email</th><th>數量</th><th>手續費</th><th>總金額</th>
+          <th>商品名稱</th><th>價格</th><th>手續費率</th><th>帳號</th><th>Email</th>
+          <th>數量</th><th>手續費</th><th>總金額</th><th>操作</th>
         </tr>
       </thead>
       <tbody>
         <tr v-for="item in likes" :key="item.sn">
-          <td>{{ item.productName }}</td>
-          <td>{{ item.price }}</td>
-          <td>{{ item.feeRate }}</td>
-          <td>{{ item.account }}</td>
-          <td>{{ item.email }}</td>
-          <td>{{ item.orderQuantity }}</td>
+          <!-- 商品名稱 -->
+          <td v-if="editSn !== item.sn">{{ item.productName }}</td>
+          <td v-else><input v-model="editForm.productName" /></td>
+
+          <!-- 價格 -->
+          <td v-if="editSn !== item.sn">{{ item.price }}</td>
+          <td v-else><input v-model.number="editForm.price" type="number" /></td>
+
+          <!-- 手續費率 -->
+          <td v-if="editSn !== item.sn">{{ item.feeRate }}</td>
+          <td v-else><input v-model.number="editForm.feeRate" type="number" /></td>
+
+          <!-- 帳號 -->
+          <td v-if="editSn !== item.sn">{{ item.account }}</td>
+          <td v-else><input v-model="editForm.account" /></td>
+
+          <!-- Email -->
+          <td v-if="editSn !== item.sn">{{ item.email }}</td>
+          <td v-else><input v-model="editForm.email" /></td>
+
+          <!-- 數量 -->
+          <td v-if="editSn !== item.sn">{{ item.orderQuantity }}</td>
+          <td v-else><input v-model.number="editForm.orderQuantity" type="number" /></td>
+
+          <!-- 手續費與總金額為自動計算 -->
           <td>{{ item.totalFee }}</td>
           <td>{{ item.totalAmount }}</td>
+
+          <!-- 操作 -->
           <td>
-            <input v-if="editSn === item.sn" v-model.number="editForm.orderQuantity" type="number" />
-            <button v-if="editSn === item.sn" @click="saveEdit(item.sn)">儲存</button>
-            <button v-else @click="startEdit(item)">編輯</button>
+            <button v-if="editSn !== item.sn" @click="startEdit(item)">編輯</button>
+            <button v-else @click="saveEdit(item.sn)">儲存</button>
             <button @click="remove(item.sn)">刪除</button>
           </td>
         </tr>
@@ -59,15 +80,15 @@ const likes = ref([])
 const products = ref([])
 
 const form = ref({
-  userId: 'A1236456789', // 無登入，預設 userId
+  userId: 'A1236456789',
   productId: '',
-  orderQuantity: 1
+  orderQuantity: null
 })
 
 const productForm = ref({
   productName: '',
-  price: 0,
-  feeRate: 0
+  price: null,
+  feeRate: null
 })
 
 const editSn = ref(null)
@@ -91,7 +112,14 @@ const remove = async (sn) => {
 }
 const startEdit = (item) => {
   editSn.value = item.sn
-  editForm.value = { orderQuantity: item.orderQuantity }
+  editForm.value = {
+    productName: item.productName,
+    price: item.price,
+    feeRate: item.feeRate,
+    account: item.account,
+    email: item.email,
+    orderQuantity: item.orderQuantity
+  }
 }
 const saveEdit = async (sn) => {
   await updateLike(sn, editForm.value)

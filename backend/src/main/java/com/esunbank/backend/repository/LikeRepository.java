@@ -66,7 +66,41 @@ public class LikeRepository {
         jdbcTemplate.update("DELETE FROM like_list WHERE sn = ?", sn);
     }
 
-    public void updateLike(int sn, int orderQuantity) {
-        jdbcTemplate.update("UPDATE like_list SET order_name = ? WHERE sn = ?", orderQuantity, sn);
+    public void updateLike(LikeResponse req) {
+        // 更新 product 表（根據 product_name 判斷是否需要更新現有的商品）
+        String updateProduct = """
+            UPDATE product
+            SET product_name = ?, price = ?, fee_rate = ?
+            WHERE no = (SELECT product_id FROM like_list WHERE sn = ?)
+        """;
+        jdbcTemplate.update(updateProduct,
+            req.getProductName(),
+            req.getPrice(),
+            req.getFeeRate(),
+            req.getSn());
+
+        // 更新 user 表的 account
+        String updateUser = """
+            UPDATE user
+            SET account = ?
+            WHERE user_id = (SELECT user_id FROM like_list WHERE sn = ?)
+        """;
+        jdbcTemplate.update(updateUser, req.getAccount(), req.getSn());
+
+        // 更新 like_list 表的數量、金額、手續費
+        double totalAmount = req.getPrice() * req.getOrderQuantity();
+        double totalFee = totalAmount * req.getFeeRate();
+
+        String updateLike = """
+            UPDATE like_list
+            SET order_name = ?, total_amount = ?, total_fee = ?
+            WHERE sn = ?
+        """;
+        jdbcTemplate.update(updateLike,
+            req.getOrderQuantity(),
+            totalAmount,
+            totalFee,
+            req.getSn());
     }
+
 }

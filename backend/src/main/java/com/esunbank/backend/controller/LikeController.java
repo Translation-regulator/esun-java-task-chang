@@ -31,7 +31,9 @@ public class LikeController {
     }
 
     @PutMapping("/{sn}")
-    public void update(@PathVariable int sn, @RequestBody LikeRequest req) {
-        likeService.updateLike(sn, req.getOrderQuantity());
+    public void update(@PathVariable int sn, @RequestBody LikeResponse req) {
+        req.setSn(sn);  
+        likeService.updateLike(req);
     }
+
 }
